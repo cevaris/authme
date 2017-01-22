@@ -13,4 +13,13 @@ public class HashUtils {
     return hf.toString();
   }
 
+  public static String timedHash(String x) {
+    return Hashing.murmur3_128()
+        .newHasher()
+        .putString(x, Charset.defaultCharset())
+        .putLong(DateTimeUtils.now().getMillis())
+        .hash()
+        .toString();
+  }
+
 }

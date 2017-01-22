@@ -22,14 +22,13 @@ public class AuthNewHandler extends AwsHandler<AuthNewRequest, AuthNewResponse> 
     LambdaLogger logger = context.getLogger();
     DynamoDB client = injector.getProvider(DynamoDB.class).get();
 
-
     Table table = client.getTable("authme.authsession.dev");
     logger.log(table.getTableName());
 
     logger.log(String.format("%s %s - %s\n", context.getFunctionName(), context.getAwsRequestId(), event));
 
     AuthNewResponse response = new AuthNewResponse();
-    response.setReceipt(HashUtils.toString(event.getEmail()));
+    response.setReceipt(HashUtils.timedHash(event.getEmail()));
 
     return response;
   }

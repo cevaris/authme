@@ -6,6 +6,8 @@ import com.amazonaws.services.dynamodbv2.document.Table;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.cevaris.authme.auth.events.AuthNewRequest;
+import com.cevaris.authme.auth.events.AuthNewResponse;
+import com.cevaris.authme.utils.DateTimeUtils;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -36,9 +38,9 @@ public class AuthNewHandlerTest {
     when(dynamoDB.getTable("authme.authsession.dev"))
         .thenReturn(new Table(aDynamoDB, "authme.authsession.dev"));
 
-    handler.handler(request, context);
-
-    assertEquals(1, 1);
+    DateTimeUtils.setCurrentMillisFixed(1485106610000L);
+    AuthNewResponse response = handler.handler(request, context);
+    assertEquals(response.getReceipt(), "7de4c76817545649c2b49ef257debb76");
   }
 
 
@@ -48,13 +50,17 @@ public class AuthNewHandlerTest {
     handler = new AuthNewHandler();
     handler.setInjector(injector);
 
-    when(context.getFunctionName())
     when(context.getLogger())
         .thenReturn(new LambdaLogger() {
           public void log(String s) {
             System.out.println(s);
           }
         });
+
+    when(context.getFunctionName())
+        .thenReturn("testfunc");
+    when(context.getAwsRequestId())
+        .thenReturn("awsReqId");
   }
 
   @After
