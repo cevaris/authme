@@ -17,7 +17,7 @@ public class AuthNewRequest {
   @Override
   public String toString() {
     try {
-      return new ObjectMapper().writer().withDefaultPrettyPrinter().writeValueAsString(this);
+      return new ObjectMapper().writer().writeValueAsString(this);
     } catch (JsonProcessingException e) {
       return super.toString();
     }

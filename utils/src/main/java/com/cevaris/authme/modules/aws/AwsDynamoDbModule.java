@@ -4,12 +4,16 @@ import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.EnvironmentVariableCredentialsProvider;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
-import com.google.inject.AbstractModule;
+import com.google.inject.Binder;
+import com.google.inject.Module;
 import com.google.inject.Provides;
 
 import javax.inject.Singleton;
 
-public class AwsDynamoDbModule extends AbstractModule {
+public class AwsDynamoDbModule implements Module {
+  public void configure(Binder binder) {
+    binder.bind(AWSCredentialsProvider.class).to(EnvironmentVariableCredentialsProvider.class);
+  }
 
   @Provides
   @Singleton
@@ -23,8 +27,4 @@ public class AwsDynamoDbModule extends AbstractModule {
     return new AmazonDynamoDBClient(credentialsProvider);
   }
 
-  @Override
-  protected void configure() {
-    bind(AWSCredentialsProvider.class).to(EnvironmentVariableCredentialsProvider.class);
-  }
 }

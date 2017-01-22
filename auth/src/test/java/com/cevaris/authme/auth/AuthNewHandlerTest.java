@@ -1,13 +1,13 @@
 package com.cevaris.authme.auth;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.model.TableDescription;
 import com.amazonaws.services.lambda.runtime.Context;
-import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.cevaris.authme.auth.events.AuthNewRequest;
 import com.cevaris.authme.auth.events.AuthNewResponse;
 import com.cevaris.authme.utils.DateTimeUtils;
+import com.cevaris.authme.utils.testing.TestContext;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -25,9 +25,10 @@ public class AuthNewHandlerTest {
   private Injector injector;
   private AuthNewHandler handler;
 
-  private Context context = mock(Context.class);
+  private Context context = new TestContext("auth-new");
   private DynamoDB dynamoDB = mock(DynamoDB.class);
-  private AmazonDynamoDB aDynamoDB = mock(AmazonDynamoDB.class);
+  private Table table = mock(Table.class);
+  private TableDescription tableDesc = mock(TableDescription.class);
 
 
   @Test
@@ -36,7 +37,10 @@ public class AuthNewHandlerTest {
     request.setEmail("fake@email.com");
 
     when(dynamoDB.getTable("authme.authsession.dev"))
-        .thenReturn(new Table(aDynamoDB, "authme.authsession.dev"));
+        .thenReturn(table);
+
+    when(table.getDescription())
+        .thenReturn(tableDesc);
 
     DateTimeUtils.setCurrentMillisFixed(1485106610000L);
     AuthNewResponse response = handler.handler(request, context);
@@ -49,18 +53,6 @@ public class AuthNewHandlerTest {
     injector = Guice.createInjector(new TestModule());
     handler = new AuthNewHandler();
     handler.setInjector(injector);
-
-    when(context.getLogger())
-        .thenReturn(new LambdaLogger() {
-          public void log(String s) {
-            System.out.println(s);
-          }
-        });
-
-    when(context.getFunctionName())
-        .thenReturn("testfunc");
-    when(context.getAwsRequestId())
-        .thenReturn("awsReqId");
   }
 
   @After
