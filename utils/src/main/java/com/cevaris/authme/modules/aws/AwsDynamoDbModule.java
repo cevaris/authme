@@ -2,8 +2,10 @@ package com.cevaris.authme.modules.aws;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.EnvironmentVariableCredentialsProvider;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
+import com.amazonaws.services.s3.model.Region;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Provides;
