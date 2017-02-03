@@ -40,6 +40,7 @@ public class AuthNewHandlerIntegrationTest {
     handler.beforeRequest(null);
     envVars.set(Const.APP_ENV, AppEnv.TEST.name());
     envVars.set(AuthSessionDynamoDB.TABLE_NAME, "authme.authsession.test");
+    envVars.set(.TABLE_NAME, "authme.authsession.test");
   }
 
   @After
