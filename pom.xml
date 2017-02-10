@@ -47,7 +47,6 @@
 
 
     <dependencies>
-
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk-dynamodb</artifactId>
@@ -62,12 +61,6 @@
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-lambda-java-core</artifactId>
             <version>1.1.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.cevaris</groupId>
-            <artifactId>utils</artifactId>
-            <version>${global.version}</version>
         </dependency>
 
         <dependency>
@@ -101,13 +94,6 @@
 
         <!-- TESTS -->
         <dependency>
-            <groupId>com.cevaris</groupId>
-            <artifactId>utils</artifactId>
-            <version>${global.version}</version>
-            <scope>test</scope>
-            <type>test-jar</type>
-        </dependency>
-        <dependency>
             <groupId>com.github.stefanbirkner</groupId>
             <artifactId>system-rules</artifactId>
             <version>1.16.0</version>
@@ -130,6 +116,7 @@
 
     <modules>
         <module>auth</module>
+        <module>configuration</module>
         <module>infos</module>
         <module>models</module>
         <module>utils</module>

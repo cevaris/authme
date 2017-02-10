@@ -13,3 +13,7 @@ buildNumber.properties
 .idea
 *.iml
 .DS_Store
+
+# do not commit secrets
+configuration/plaintext/*.properties
+!configuration/plaintext/example.properties

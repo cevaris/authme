@@ -8,8 +8,8 @@ import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.cevaris.authme.auth.events.AuthNewRequest;
 import com.cevaris.authme.auth.events.AuthNewResponse;
 import com.cevaris.authme.models.storage.dynamodb.AuthSessionDynamoDB;
-import com.cevaris.authme.modules.aws.AppModule;
-import com.cevaris.authme.modules.aws.AwsDynamoDbModule;
+import com.cevaris.authme.aws.modules.AwsCredentialsModule;
+import com.cevaris.authme.aws.modules.AwsDynamoDbModule;
 import com.cevaris.authme.utils.AwsHandler;
 import com.cevaris.authme.utils.DateTimeUtils;
 import com.cevaris.authme.utils.HashUtils;
@@ -24,7 +24,7 @@ import java.util.List;
 public class AuthNewHandler extends AwsHandler<AuthNewRequest, AuthNewResponse> {
   @Override
   public List<Module> modules() {
-    return Lists.newArrayList(new AppModule(), new AwsDynamoDbModule());
+    return Lists.newArrayList(new AwsCredentialsModule(), new AwsDynamoDbModule());
   }
 
   @Override

@@ -1,11 +1,8 @@
-package com.cevaris.authme.modules.aws;
+package com.cevaris.authme.aws.modules;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.EnvironmentVariableCredentialsProvider;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
-import com.amazonaws.services.s3.model.Region;
 import com.google.inject.Binder;
 import com.google.inject.Module;
 import com.google.inject.Provides;
@@ -13,9 +10,6 @@ import com.google.inject.Provides;
 import javax.inject.Singleton;
 
 public class AwsDynamoDbModule implements Module {
-  public void configure(Binder binder) {
-    binder.bind(AWSCredentialsProvider.class).to(EnvironmentVariableCredentialsProvider.class);
-  }
 
   @Provides
   @Singleton
@@ -29,4 +23,6 @@ public class AwsDynamoDbModule implements Module {
     return new AmazonDynamoDBClient(credentialsProvider);
   }
 
+  public void configure(Binder binder) {
+  }
 }
