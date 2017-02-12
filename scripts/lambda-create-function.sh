@@ -30,7 +30,7 @@ case "${CHOICE}" in
     echo "starting upload..."
 
     aws lambda create-function \
-        --function-name ${LAMBDA_NAME} \
+        --function-value ${LAMBDA_NAME} \
         --zip-file "fileb://${JAR_PATH}" \
         --role arn:aws:iam::755892755226:role/service-role/authme-dev \
         --handler ${HANDLER_NAME} \

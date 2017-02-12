@@ -3,16 +3,18 @@ package com.cevaris.authme.auth.events;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+
+@Builder
+@Getter
+@Setter
 public class AuthNewRequest {
-  private String email;
 
-  public String getEmail() {
-    return email;
-  }
+  private String identity;
 
-  public void setEmail(String email) {
-    this.email = email;
-  }
+  private String identityType;
 
   @Override
   public String toString() {

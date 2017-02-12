@@ -5,13 +5,13 @@ public enum AuthSessionState {
   REJECTED("rejected"),
   OPEN("open");
 
-  private final String state;
+  private final String value;
 
-  AuthSessionState(String state) {
-    this.state = state;
+  AuthSessionState(String value) {
+    this.value = value;
   }
 
-  public String getName() {
-    return state;
+  public String getValue() {
+    return value;
   }
 }

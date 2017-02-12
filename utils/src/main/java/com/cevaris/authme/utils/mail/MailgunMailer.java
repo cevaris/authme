@@ -1,7 +1,6 @@
 package com.cevaris.authme.utils.mail;
 
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.google.common.base.Preconditions;
@@ -22,7 +21,7 @@ public class MailgunMailer implements Mailer {
     this.config = config;
   }
 
-  public Boolean send(String to, String subject, String text) {
+  public void send(String to, String subject, String text) throws RuntimeException {
     Preconditions.checkNotNull(to, subject, text);
 
     logger.info(String.format("to=[%s] subject=[%s] text[%s]", to, subject, text));
@@ -35,9 +34,7 @@ public class MailgunMailer implements Mailer {
         .send();
 
     if (!r.isOk()) {
-      logger.log(Level.SEVERE, String.format("error sending message to %s: %s", to, r.responseMessage()));
+      throw new RuntimeException(String.format("error sending message to %s: %s", to, r.responseMessage()));
     }
-
-    return r.isOk();
   }
 }

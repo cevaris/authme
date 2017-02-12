@@ -1,9 +1,9 @@
 package com.cevaris.authme.utils.mail;
 
 
-import com.google.inject.Inject;
-
 import java.util.logging.Logger;
+
+import com.google.inject.Inject;
 
 public class LoggerMailer implements Mailer {
 
@@ -13,8 +13,7 @@ public class LoggerMailer implements Mailer {
   public LoggerMailer() {
   }
 
-  public Boolean send(String to, String subject, String text) {
+  public void send(String to, String subject, String text) throws RuntimeException {
     logger.info(String.format("to=[%s] subject=[%s] text[%s]", to, subject, text));
-    return true;
   }
 }

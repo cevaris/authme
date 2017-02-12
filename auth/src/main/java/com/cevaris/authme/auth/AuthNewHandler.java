@@ -16,7 +16,6 @@ import com.cevaris.authme.models.AuthSession;
 import com.cevaris.authme.models.AuthSessionState;
 import com.cevaris.authme.models.IdentityType;
 import com.cevaris.authme.models.storage.dynamodb.AuthSessionDynamoDB;
-import com.cevaris.authme.models.storage.dynamodb.DynamoDbRepository;
 import com.cevaris.authme.utils.AwsHandler;
 import com.cevaris.authme.utils.DateTimeUtils;
 import com.cevaris.authme.utils.HashUtils;
@@ -33,7 +32,7 @@ import org.joda.time.DateTime;
 
 public class AuthNewHandler extends AwsHandler<AuthNewRequest, AuthNewResponse> {
 
-  private final static String SALT_AUTH_TOKEN = "salt.auth_token";
+  public final static String SALT_AUTH_TOKEN = "salt.auth_token";
 
   @Override
   public List<Module> modules() {
@@ -48,7 +47,7 @@ public class AuthNewHandler extends AwsHandler<AuthNewRequest, AuthNewResponse> 
 
   @Override
   public AuthNewResponse handler(AuthNewRequest event, Context context) {
-    DynamoDbRepository<AuthSession> client = getInstance(AuthSessionDynamoDB.class);
+    AuthSessionDynamoDB client = getInstance(AuthSessionDynamoDB.class);
     Mailer mailConfig = getInstance(Mailer.class);
     PropertyStore propertyStore = getInstance(PropertyStore.class);
 
@@ -57,31 +56,50 @@ public class AuthNewHandler extends AwsHandler<AuthNewRequest, AuthNewResponse> 
 
     DateTime createdAt = DateTimeUtils.now();
     String saltAuthToken = propertyStore.get(SALT_AUTH_TOKEN);
-    String token = HashUtils.timedHash(String.format("%s/%s", saltAuthToken, event.getEmail()), createdAt);
-
-    String body = String.format("<a href=\"https://auth-me.com/verify?token=%s\">Authorize Me</a>", token);
-    mailConfig.send(event.getEmail(), "Auth Me Request", body);
+    String token = HashUtils.timedHash(String.format("%s/%s", saltAuthToken, event.getIdentity()), createdAt);
 
     AuthSession authSession = AuthSession.builder()
-        .authSessionState(AuthSessionState.OPEN.getName())
+        .authSessionState(AuthSessionState.OPEN.getValue())
         .authToken(token)
         .createdAt(createdAt.toDate())
-        .identity(event.getEmail())
-        .identityType(IdentityType.EMAIL.getName())
+        .identity(event.getIdentity())
+        .identityType(IdentityType.EMAIL.getValue())
         .build();
 
+    AuthNewResponse.AuthNewResponseBuilder responseBuilder = AuthNewResponse.builder()
+        .success(true)
+        .request(event);
+
     try {
-      client.create(authSession);
-      logger.log(String.format("persisted auth_session for %s", authSession.getIdentity()));
+      AuthSession created = client.create(authSession);
+      logger.log(String.format("persisted auth_session %s", created));
     } catch (RuntimeException e) {
-      logger.log(String.format("error in saving auth_session for %s: %s", authSession.getIdentity(), e.getMessage()));
+      String msg = String.format("error in saving auth_session for %s: %s", authSession.getIdentity(), e.getMessage());
+      logger.log(msg);
+      return responseBuilder
+          .success(false)
+          .message(msg)
+          .build();
     }
 
-    AuthNewResponse response = new AuthNewResponse();
-    response.setRequest(event);
-    response.setIdentity(token);
+    try {
+      if (IdentityType.EMAIL == IdentityType.withValue(event.getIdentityType())) {
+        String body = String.format("<a href=\"https://auth-me.com/verify?token=%s\">Authorize Me</a>", token);
+        mailConfig.send(event.getIdentity(), "Auth Me Request", body);
+        logger.log(String.format("sent email auth_session for %s", authSession.getIdentity()));
+      } else {
+        logger.log(String.format("identity type %s not supported; email or phone only", event.getIdentityType()));
+      }
+    } catch (RuntimeException e) {
+      String msg = String.format("error sending email for %s: %s", authSession.getIdentity(), e.getMessage());
+      logger.log(msg);
+      return responseBuilder
+          .success(false)
+          .message(msg)
+          .build();
+    }
 
-    return response;
+    return responseBuilder.build();
   }
 
   @Override

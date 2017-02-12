@@ -62,7 +62,7 @@ public class PropertyStore {
   private Object getProperty(String value) {
     Object result = this.properties.get(value);
     if (result == null) {
-      logger.log(Level.WARNING, String.format("%s property not found", value));
+      logger.log(Level.SEVERE, String.format("%s property not found", value));
     }
     return result;
   }

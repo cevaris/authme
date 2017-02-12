@@ -5,6 +5,8 @@ import java.util.Date;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIndexHashKey;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -31,4 +33,12 @@ public class AuthSession {
   @DynamoDBAttribute(attributeName = "auth_session_state")
   private String authSessionState;
 
+  @Override
+  public String toString() {
+    try {
+      return new ObjectMapper().writer().writeValueAsString(this);
+    } catch (JsonProcessingException e) {
+      return super.toString();
+    }
+  }
 }
