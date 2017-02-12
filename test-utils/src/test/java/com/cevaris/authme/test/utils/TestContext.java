@@ -1,12 +1,13 @@
-package com.cevaris.authme.utils.testing;
+package com.cevaris.authme.test.utils;
+
+import java.util.UUID;
 
 import com.amazonaws.services.lambda.runtime.ClientContext;
 import com.amazonaws.services.lambda.runtime.CognitoIdentity;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.util.UUID;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class TestContext implements Context {
   private String functionName;

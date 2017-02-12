@@ -7,21 +7,23 @@ import java.nio.ByteBuffer;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.inject.Named;
 
 import com.amazonaws.services.kms.AWSKMSClient;
 import com.amazonaws.services.kms.model.DecryptRequest;
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
-import com.google.inject.Inject;
 
 public class PropertyStore {
 
   private final AWSKMSClient awskmsClient;
   private final Properties properties;
   private static final Logger logger = Logger.getLogger(PropertyStore.class.getName());
+  public static final String PROPERTY_RESOURCE_PATH = "PROPERTY_RESOURCE_PATH";
+  private final String resourcePath;
 
-  @Inject
-  public PropertyStore(AWSKMSClient awskmsClient) {
+  public PropertyStore(AWSKMSClient awskmsClient, @Named(PROPERTY_RESOURCE_PATH) String resourcePath) {
+    this.resourcePath = resourcePath;
     this.properties = new Properties();
     this.awskmsClient = awskmsClient;
   }
@@ -38,7 +40,12 @@ public class PropertyStore {
     return (String) getProperty(value);
   }
 
-  public PropertyStore loadResource(String resource) {
+  public PropertyStore loadResource() {
+    loadResource(resourcePath);
+    return this;
+  }
+
+  private PropertyStore loadResource(String resource) {
     try {
       InputStream encInputStream = getResourceInputStream(resource);
       InputStream plainInputStream = decryptInputStream(encInputStream);

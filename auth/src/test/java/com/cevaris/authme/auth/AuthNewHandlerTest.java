@@ -6,12 +6,17 @@ import com.amazonaws.services.dynamodbv2.model.TableDescription;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.cevaris.authme.auth.events.AuthNewRequest;
 import com.cevaris.authme.auth.events.AuthNewResponse;
+import com.cevaris.authme.models.storage.dynamodb.AuthSessionDynamoDB;
+import com.cevaris.authme.test.utils.TestContext;
 import com.cevaris.authme.utils.DateTimeUtils;
-import com.cevaris.authme.utils.testing.TestContext;
-import com.google.inject.AbstractModule;
+import com.cevaris.authme.utils.mail.LoggerMailer;
+import com.cevaris.authme.utils.mail.Mailer;
+import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Provider;
+import com.google.inject.Module;
+import com.google.inject.name.Names;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,25 +31,27 @@ public class AuthNewHandlerTest {
   private AuthNewHandler handler;
 
   private Context context = new TestContext("auth-new");
-  private DynamoDB dynamoDB = mock(DynamoDB.class);
-  private Table table = mock(Table.class);
-  private TableDescription tableDesc = mock(TableDescription.class);
+  private Mailer mailer = new LoggerMailer();
+
+  private DynamoDB mockDynamoDb = mock(DynamoDB.class);
+  private Table mockTable = mock(Table.class);
+  private TableDescription mockTableDesc = mock(TableDescription.class);
 
 
   @Test
   public void testSuccessful() {
     AuthNewRequest request = new AuthNewRequest();
-    request.setEmail("fake@email.com");
+    request.setEmail("test@example.com");
 
-    when(dynamoDB.getTable("authme.authsession.dev"))
-        .thenReturn(table);
+    when(mockDynamoDb.getTable("authme.authsession.dev"))
+        .thenReturn(mockTable);
 
-    when(table.getDescription())
-        .thenReturn(tableDesc);
+    when(mockTable.describe())
+        .thenReturn(mockTableDesc);
 
     DateTimeUtils.setCurrentMillisFixed(1485106610000L);
     AuthNewResponse response = handler.handler(request, context);
-    assertEquals(response.getReceipt(), "7de4c76817545649c2b49ef257debb76");
+    assertEquals("6498bb79e7f47b8dc00e64f5f263b54d", response.getReceipt());
   }
 
 
@@ -60,15 +67,14 @@ public class AuthNewHandlerTest {
     injector = null;
   }
 
-  class TestModule extends AbstractModule {
-    @Override
-    protected void configure() {
-      bind(DynamoDB.class).toProvider(new Provider<DynamoDB>() {
-        public DynamoDB get() {
-          return dynamoDB;
-        }
-      });
+  class TestModule implements Module {
+    public void configure(Binder binder) {
+      binder.bind(DynamoDB.class).toInstance(mockDynamoDb);
+      binder.bind(Mailer.class).toInstance(mailer);
+      binder.bind(String.class)
+          .annotatedWith(Names.named(AuthSessionDynamoDB.TABLE_NAME))
+          .toInstance("authme.authsession.dev");
     }
-  }
 
+  }
 }
