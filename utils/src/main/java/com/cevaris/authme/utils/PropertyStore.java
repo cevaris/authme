@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.amazonaws.services.kms.AWSKMSClient;
@@ -22,6 +23,7 @@ public class PropertyStore {
   public static final String PROPERTY_RESOURCE_PATH = "PROPERTY_RESOURCE_PATH";
   private final String resourcePath;
 
+  @Inject
   public PropertyStore(AWSKMSClient awskmsClient, @Named(PROPERTY_RESOURCE_PATH) String resourcePath) {
     this.resourcePath = resourcePath;
     this.properties = new Properties();

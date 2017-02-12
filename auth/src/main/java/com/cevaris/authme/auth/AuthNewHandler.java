@@ -59,7 +59,8 @@ public class AuthNewHandler extends AwsHandler<AuthNewRequest, AuthNewResponse> 
     String saltAuthToken = propertyStore.get(SALT_AUTH_TOKEN);
     String token = HashUtils.timedHash(String.format("%s/%s", saltAuthToken, event.getEmail()), createdAt);
 
-    mailConfig.send(event.getEmail(), "Auth Me Request", "<a href=\"https://auth-me.com/verify?token=abcdefg\">Authorize Me</a>");
+    String body = String.format("<a href=\"https://auth-me.com/verify?token=%s\">Authorize Me</a>", token);
+    mailConfig.send(event.getEmail(), "Auth Me Request", body);
 
     AuthSession authSession = AuthSession.builder()
         .authSessionState(AuthSessionState.OPEN.getName())

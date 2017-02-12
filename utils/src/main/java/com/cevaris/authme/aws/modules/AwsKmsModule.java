@@ -24,6 +24,5 @@ public class AwsKmsModule implements Module {
   }
 
   public void configure(Binder binder) {
-    binder.bind(AwsRegionProvider.class).to(AwsEnvVarOverrideRegionProvider.class);
   }
 }

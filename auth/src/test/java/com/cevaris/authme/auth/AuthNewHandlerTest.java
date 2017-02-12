@@ -9,6 +9,7 @@ import com.cevaris.authme.auth.events.AuthNewResponse;
 import com.cevaris.authme.models.storage.dynamodb.AuthSessionDynamoDB;
 import com.cevaris.authme.test.utils.TestContext;
 import com.cevaris.authme.utils.DateTimeUtils;
+import com.cevaris.authme.utils.PropertyStore;
 import com.cevaris.authme.utils.mail.LoggerMailer;
 import com.cevaris.authme.utils.mail.Mailer;
 import com.google.inject.Binder;
@@ -51,7 +52,7 @@ public class AuthNewHandlerTest {
 
     DateTimeUtils.setCurrentMillisFixed(1485106610000L);
     AuthNewResponse response = handler.handler(request, context);
-    assertEquals("6498bb79e7f47b8dc00e64f5f263b54d", response.getId());
+    assertEquals("8385e2f12b2955a31c1a52a736c2612f", response.getId());
   }
 
 
@@ -74,6 +75,9 @@ public class AuthNewHandlerTest {
       binder.bind(String.class)
           .annotatedWith(Names.named(AuthSessionDynamoDB.TABLE_NAME))
           .toInstance("authme.authsession.dev");
+      binder.bind(String.class)
+          .annotatedWith(Names.named(PropertyStore.PROPERTY_RESOURCE_PATH))
+          .toInstance("/enc-test.properties");
     }
 
   }

@@ -4,7 +4,6 @@ import com.amazonaws.services.lambda.runtime.Context;
 import com.cevaris.authme.auth.events.AuthNewRequest;
 import com.cevaris.authme.auth.events.AuthNewResponse;
 import com.cevaris.authme.test.utils.TestContext;
-import com.cevaris.authme.utils.DateTimeUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -23,8 +22,8 @@ public class AuthNewHandlerIntegrationTest {
   public void testSuccessful() {
     AuthNewRequest request = new AuthNewRequest();
     request.setEmail("Helfinch1979@einrot.com");
+    // http://www.fakemailgenerator.com/inbox/einrot.com/helfinch1979/
 
-    DateTimeUtils.setCurrentMillisFixed(1485106610000L);
     AuthNewResponse response = handler.handler(request, context);
   }
 
