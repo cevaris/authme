@@ -51,7 +51,7 @@ public class AuthNewHandlerTest {
 
     DateTimeUtils.setCurrentMillisFixed(1485106610000L);
     AuthNewResponse response = handler.handler(request, context);
-    assertEquals("6498bb79e7f47b8dc00e64f5f263b54d", response.getReceipt());
+    assertEquals("6498bb79e7f47b8dc00e64f5f263b54d", response.getId());
   }
 
 

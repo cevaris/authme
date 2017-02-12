@@ -10,7 +10,7 @@ public enum IdentityType {
     this.state = state;
   }
 
-  public String getState() {
+  public String getName() {
     return state;
   }
 

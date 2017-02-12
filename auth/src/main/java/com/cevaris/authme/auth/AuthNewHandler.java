@@ -13,6 +13,8 @@ import com.cevaris.authme.aws.modules.AwsDynamoDbModule;
 import com.cevaris.authme.aws.modules.AwsKmsModule;
 import com.cevaris.authme.mailgun.modules.MailgunModule;
 import com.cevaris.authme.models.AuthSession;
+import com.cevaris.authme.models.AuthSessionState;
+import com.cevaris.authme.models.IdentityType;
 import com.cevaris.authme.models.storage.dynamodb.AuthSessionDynamoDB;
 import com.cevaris.authme.models.storage.dynamodb.DynamoDbRepository;
 import com.cevaris.authme.utils.AwsHandler;
@@ -30,6 +32,9 @@ import org.joda.time.DateTime;
 
 
 public class AuthNewHandler extends AwsHandler<AuthNewRequest, AuthNewResponse> {
+
+  private final static String SALT_AUTH_TOKEN = "salt.auth_token";
+
   @Override
   public List<Module> modules() {
     return Lists.newArrayList(
@@ -45,16 +50,35 @@ public class AuthNewHandler extends AwsHandler<AuthNewRequest, AuthNewResponse> 
   public AuthNewResponse handler(AuthNewRequest event, Context context) {
     DynamoDbRepository<AuthSession> client = getInstance(AuthSessionDynamoDB.class);
     Mailer mailConfig = getInstance(Mailer.class);
+    PropertyStore propertyStore = getInstance(PropertyStore.class);
 
     LambdaLogger logger = context.getLogger();
     logger.log(String.format("%s %s - %s\n", context.getFunctionName(), context.getAwsRequestId(), event));
 
     DateTime createdAt = DateTimeUtils.now();
+    String saltAuthToken = propertyStore.get(SALT_AUTH_TOKEN);
+    String token = HashUtils.timedHash(String.format("%s/%s", saltAuthToken, event.getEmail()), createdAt);
 
     mailConfig.send(event.getEmail(), "Auth Me Request", "<a href=\"https://auth-me.com/verify?token=abcdefg\">Authorize Me</a>");
 
+    AuthSession authSession = AuthSession.builder()
+        .authSessionState(AuthSessionState.OPEN.getName())
+        .authToken(token)
+        .createdAt(createdAt.toDate())
+        .identity(event.getEmail())
+        .identityType(IdentityType.EMAIL.getName())
+        .build();
+
+    try {
+      client.create(authSession);
+      logger.log(String.format("persisted auth_session for %s", authSession.getIdentity()));
+    } catch (RuntimeException e) {
+      logger.log(String.format("error in saving auth_session for %s: %s", authSession.getIdentity(), e.getMessage()));
+    }
+
     AuthNewResponse response = new AuthNewResponse();
-    response.setReceipt(HashUtils.timedHash(event.getEmail(), createdAt));
+    response.setRequest(event);
+    response.setIdentity(token);
 
     return response;
   }

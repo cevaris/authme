@@ -130,6 +130,11 @@
             <version>2.9.7</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.12</version>
+        </dependency>
 
         <!-- TESTS -->
         <dependency>

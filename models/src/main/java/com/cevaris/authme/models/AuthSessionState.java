@@ -11,7 +11,7 @@ public enum AuthSessionState {
     this.state = state;
   }
 
-  public String getState() {
+  public String getName() {
     return state;
   }
 }
